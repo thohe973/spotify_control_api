@@ -29,7 +29,8 @@ app.post('/fetch-and-save-tokens', (req, res) => {
   }
 
   const code = req.body.code;
-  const redirect_uri = 'http://localhost:3000';
+  //Must match redirectUrl in spotify_control project
+  const redirect_uri = 'http://192.168.1.205:3000';
 
   const authOptions = {
     url: 'https://accounts.spotify.com/api/token',
