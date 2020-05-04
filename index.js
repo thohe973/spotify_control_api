@@ -1,6 +1,5 @@
 const express = require('express');
 var request = require('request');
-var requestPromise = require('request-promise');
 const spotifyIds = require('./spotify_ids');
 const spotifyUrls = require('./utils/spotify_urls');
 const tokens = require('./tokens.json');
@@ -62,9 +61,6 @@ app.post('/fetch-and-save-tokens', (req, res) => {
 app.put('/play', async (req, res) => {
   await refreshToken();
 
-  const baseEndpoint = 'https://api.spotify.com/v1/';
-  const playUrl = `${baseEndpoint}me/player/play`;
-
   request.put({
     url: spotifyUrls.playUrl + getDeviceQuery(req),
     headers: getAuthHeader(),
@@ -75,9 +71,6 @@ app.put('/play', async (req, res) => {
 
 app.put('/play-playlist', async (req, res) => {
   await refreshToken();
-
-  const baseEndpoint = 'https://api.spotify.com/v1/';
-  const playUrl = `${baseEndpoint}me/player/play`;
 
   request.put({
     url: spotifyUrls.playUrl + getDeviceQuery(req),
@@ -177,11 +170,6 @@ app.put('/transfer', async (req, res) => {
     res.send(response)
   });
 });
-
-app.get('/test', async (req, res) => {
-  res.send(new Date(tokens.expires))
-  // res.send(tokenExpired())
-})
 
 function getDeviceQuery(req) {
   if (req.query.device_id) {
