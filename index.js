@@ -69,6 +69,23 @@ app.put('/play', async (req, res) => {
   });
 });
 
+app.put('/play-playlist-recently-added', async (req, res) => {
+  await refreshToken();
+
+  const uris = await getRecentlyAddedTracksUris(req.query.playlist);
+  request.put({
+    url: spotifyUrls.playUrl + getDeviceQuery(req),
+    body: `{"uris": ${JSON.stringify(uris)}}`,
+    headers: {
+      ...getAuthHeader(),
+      'Content-Type': 'application/json'
+    },
+  }, (error, response, body) => {
+    res.send(response)
+  });
+});
+
+
 app.put('/play-playlist', async (req, res) => {
   await refreshToken();
 
@@ -148,7 +165,6 @@ app.get('/playlists', async (req, res) => {
     url: spotifyUrls.getPlaylistsUrl,
     headers: getAuthHeader()
   }, (error, response, body) => {
-    console.log(body)
     res.setHeader("Content-Type", "application/json");
     res.send(body)
   });
@@ -214,12 +230,56 @@ async function refreshToken() {
         return;
       }
       else {
-        reject(error)
+        console.log(JSON.stringify(body));
+        resolve();
         return;
       }
     });
   });
 }
 
+async function getRecentlyAddedTracksUris(playlistId) {
+  const total = await getPlaylistTotal(playlistId);
+  const limit = 100; //Max limit
+  const offset = Math.max(total - limit, 0);
+
+  return new Promise(function (resolve, reject) {
+    url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`
+    request.get({
+      url: url + `?limit=${limit}&offset=${offset}`,
+      headers: getAuthHeader(),
+    }, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        const res = JSON.parse(body);
+        const uris = res.items.map(t => t.track.uri).reverse();
+        resolve(uris);
+        return;
+      } else {
+        console.log(JSON.stringify(body));
+        resolve([]);
+        return;
+      }
+    });
+  });
+}
+
+async function getPlaylistTotal(id) {
+  return new Promise(function (resolve, reject) {
+    url = `https://api.spotify.com/v1/playlists/${id}/tracks`
+    var r = request.get({
+      url: url + '?limit=1',
+      headers: getAuthHeader(),
+    }, (error, response, body) => {
+      if (!error && response.statusCode === 200) {
+        resolve(JSON.parse(body).total);
+        return;
+      } else {
+        console.log(JSON.stringify(body));
+        resolve(1);
+        return;
+      }
+    });
+  });
+}
 
 app.listen(port, () => console.log(`[${new Date().toLocaleTimeString()}] Spotify help api on ${port}`))
