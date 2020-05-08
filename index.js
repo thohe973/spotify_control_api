@@ -65,7 +65,8 @@ app.put('/play', async (req, res) => {
     url: spotifyUrls.playUrl + getDeviceQuery(req),
     headers: getAuthHeader(),
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
@@ -81,7 +82,8 @@ app.put('/play-playlist-recently-added', async (req, res) => {
       'Content-Type': 'application/json'
     },
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
@@ -97,7 +99,8 @@ app.put('/play-playlist', async (req, res) => {
       'Content-Type': 'application/json'
     },
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
@@ -108,7 +111,8 @@ app.put('/pause', async (req, res) => {
     url: spotifyUrls.pauseUrl + getDeviceQuery(req),
     headers: getAuthHeader(),
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
@@ -119,7 +123,8 @@ app.put('/next', async (req, res) => {
     url: spotifyUrls.nextUrl + getDeviceQuery(req),
     headers: getAuthHeader(),
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
@@ -130,7 +135,8 @@ app.put('/prev', async (req, res) => {
     url: spotifyUrls.prevUrl + getDeviceQuery(req),
     headers: getAuthHeader(),
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
@@ -141,7 +147,8 @@ app.put('/shuffle', async (req, res) => {
     url: spotifyUrls.setShuffleUrl + (getDeviceQuery(req) || '?') + `&state=${req.query.state}`,
     headers: getAuthHeader(),
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
@@ -153,6 +160,7 @@ app.get('/devices', async (req, res) => {
     headers: getAuthHeader()
   }, (error, response, body) => {
     res.setHeader("Content-Type", "application/json");
+    res.status(response.statusCode);
     res.send(body)
   });
 
@@ -166,6 +174,7 @@ app.get('/playlists', async (req, res) => {
     headers: getAuthHeader()
   }, (error, response, body) => {
     res.setHeader("Content-Type", "application/json");
+    res.status(response.statusCode);
     res.send(body)
   });
 
@@ -183,7 +192,8 @@ app.put('/transfer', async (req, res) => {
       'Content-Type': 'application/json'
     },
   }, (error, response, body) => {
-    res.send(response)
+    res.status(response.statusCode);
+    res.send(response);
   });
 });
 
