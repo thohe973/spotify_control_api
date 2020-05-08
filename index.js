@@ -73,18 +73,35 @@ app.put('/play', async (req, res) => {
 app.put('/play-playlist-recently-added', async (req, res) => {
   await refreshToken();
 
-  const uris = await getRecentlyAddedTracksUris(req.query.playlist);
-  request.put({
-    url: spotifyUrls.playUrl + getDeviceQuery(req),
-    body: `{"uris": ${JSON.stringify(uris)}}`,
-    headers: {
-      ...getAuthHeader(),
-      'Content-Type': 'application/json'
-    },
-  }, (error, response, body) => {
-    res.status(response.statusCode);
-    res.send(response);
-  });
+  const [total, userId] = await getPlaylistTotalAndUserId(req.query.playlist);
+  if (userId) {
+    const uris = await getRecentlyAddedTracksUris(req.query.playlist, total);
+    request.put({
+      url: spotifyUrls.playUrl + getDeviceQuery(req),
+      body: `{"uris": ${JSON.stringify(uris)}}`,
+      headers: {
+        ...getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+    }, (error, response, body) => {
+      res.status(response.statusCode);
+      res.send(response);
+    });
+  } else {
+    // Playlists created by Spotify plays in the correct order
+    request.put({
+      url: spotifyUrls.playUrl + getDeviceQuery(req),
+      body: `{"context_uri": "spotify:playlist:${req.query.playlist}"}`,
+      headers: {
+        ...getAuthHeader(),
+        'Content-Type': 'application/json'
+      },
+    }, (error, response, body) => {
+      res.status(response.statusCode);
+      res.send(response);
+    });
+  }
+
 });
 
 
@@ -248,8 +265,7 @@ async function refreshToken() {
   });
 }
 
-async function getRecentlyAddedTracksUris(playlistId) {
-  const total = await getPlaylistTotal(playlistId);
+async function getRecentlyAddedTracksUris(playlistId, total) {
   const limit = 100; //Max limit
   const offset = Math.max(total - limit, 0);
 
@@ -273,7 +289,7 @@ async function getRecentlyAddedTracksUris(playlistId) {
   });
 }
 
-async function getPlaylistTotal(id) {
+async function getPlaylistTotalAndUserId(id) {
   return new Promise(function (resolve, reject) {
     url = `https://api.spotify.com/v1/playlists/${id}/tracks`
     var r = request.get({
@@ -281,11 +297,13 @@ async function getPlaylistTotal(id) {
       headers: getAuthHeader(),
     }, (error, response, body) => {
       if (!error && response.statusCode === 200) {
-        resolve(JSON.parse(body).total);
+        const bodyObj = JSON.parse(body);
+        const user = bodyObj.items.length > 0 ? bodyObj.items[0].added_by.id : '';
+        resolve([bodyObj.total, user]);
         return;
       } else {
         console.log(JSON.stringify(body));
-        resolve(1);
+        resolve([1, '']);
         return;
       }
     });
