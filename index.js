@@ -17,6 +17,10 @@ let allowCrossDomain = (req, res, next) => {
 }
 app.use(allowCrossDomain);
 
+app.get('/ping', (req, res) => {
+  res.send('pong');
+});
+
 app.get('/login-needed', (req, res) => {
   res.send({ loginNeeded: !tokens.refresh_token });
 });
