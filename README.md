@@ -1,2 +1,5 @@
 ## Development with hot reload
-$ npm start
+```
+npm install -g nodemon
+npm start
+```

@@ -4,10 +4,11 @@ const spotifyIds = require('./spotify_ids');
 const spotifyUrls = require('./utils/spotify_urls');
 const tokens = require('./tokens.json');
 const fs = require("fs");
+const path = require('path');
 
 const app = express();
 app.use(express.json()) // Parse body
-const port = 3010;
+const port = 3000;
 
 let allowCrossDomain = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', "*");
@@ -16,6 +17,9 @@ let allowCrossDomain = (req, res, next) => {
   next();
 }
 app.use(allowCrossDomain);
+
+// React files
+app.use(express.static(path.join(__dirname, 'frontend/build')));
 
 app.get('/ping', (req, res) => {
   res.send('pong');
@@ -216,6 +220,10 @@ app.put('/transfer', async (req, res) => {
     res.status(response.statusCode);
     res.send(response);
   });
+});
+
+app.get('*', (req,res) =>{
+  res.sendFile(path.join(__dirname+'/frontend/build/index.html'));
 });
 
 function getDeviceQuery(req) {
