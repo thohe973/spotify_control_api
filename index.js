@@ -8,7 +8,7 @@ const path = require('path');
 
 const app = express();
 app.use(express.json()) // Parse body
-const port = 3000;
+const port = 3010;
 
 let allowCrossDomain = (req, res, next) => {
   res.header('Access-Control-Allow-Origin', "*");

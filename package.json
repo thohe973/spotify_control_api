@@ -8,14 +8,15 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "nodemonConfig": {
-    "ignore": ["tokens.json"]
+    "ignore": [
+      "tokens.json"
+    ]
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.5"
+    "request": "^2.88.0"
   },
   "devDependencies": {}
 }
