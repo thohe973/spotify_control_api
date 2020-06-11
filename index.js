@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const express = require('express');
 var request = require('request');
 const spotifyIds = require('./spotify_ids');
